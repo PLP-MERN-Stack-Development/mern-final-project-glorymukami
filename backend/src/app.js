@@ -34,13 +34,35 @@ const limiter = rateLimit({
 });
 app.use('/api/', limiter);
 
-// CORS configuration
+// CORS configuration - UPDATED & FIXED
+const allowedOrigins = [
+  'http://localhost:5173',
+  'http://127.0.0.1:5173',
+  'https://your-shopsphere-app.vercel.app', // Your future frontend URL
+  process.env.CLIENT_URL // From environment variable
+].filter(Boolean); // Remove any undefined values
+
 app.use(cors({
-  origin: process.env.CLIENT_URL || 'http://localhost:5173',
+  origin: function (origin, callback) {
+    // Allow requests with no origin (like mobile apps or curl requests)
+    if (!origin) return callback(null, true);
+    
+    if (allowedOrigins.indexOf(origin) === -1) {
+      const msg = `The CORS policy for this site does not allow access from the specified Origin: ${origin}`;
+      console.log('🚫 CORS Blocked:', origin);
+      return callback(new Error(msg), false);
+    }
+    
+    console.log('✅ CORS Allowed:', origin);
+    return callback(null, true);
+  },
   credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept', 'Origin']
 }));
+
+// Handle preflight requests explicitly
+app.options('*', cors());
 
 // Special handling for webhook - must come before express.json()
 app.post('/api/payments/webhook', express.raw({type: 'application/json'}), (req, res, next) => {
@@ -55,6 +77,17 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 app.use((req, res, next) => {
   console.log(`${new Date().toISOString()} - ${req.method} ${req.originalUrl}`);
   next();
+});
+
+// CORS test route - ADD THIS
+app.get('/api/test-cors', (req, res) => {
+  res.json({
+    success: true,
+    message: 'CORS is working correctly! 🎉',
+    allowedOrigins: allowedOrigins,
+    yourOrigin: req.headers.origin || 'No origin header',
+    timestamp: new Date().toISOString()
+  });
 });
 
 // Health check route
