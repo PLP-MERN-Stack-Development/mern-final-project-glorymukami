@@ -17,29 +17,49 @@ const Navbar = () => {
 
   const isActive = (path) => location.pathname === path;
 
+  // Safe cart count - ensure it's always a number
+  const cartItemsCount = typeof getCartItemsCount === 'function' ? getCartItemsCount() : 0;
+
   return (
-    <nav className="bg-white shadow-lg sticky top-0 z-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center h-16">
+    <nav style={{ background: 'white', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)', position: 'sticky', top: 0, zIndex: 50 }}>
+      <div style={{ maxWidth: '80rem', margin: '0 auto', padding: '0 1rem' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', height: '4rem' }}>
           {/* Logo */}
-          <Link to="/" className="flex items-center space-x-2">
-            <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
-              <span className="text-white font-bold text-sm">SS</span>
+          <Link to="/" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+            <div style={{ width: '2rem', height: '2rem', background: '#2563eb', borderRadius: '0.5rem', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <span style={{ color: 'white', fontWeight: 'bold', fontSize: '0.875rem' }}>SS</span>
             </div>
-            <span className="text-xl font-bold text-gray-900">ShopSphere</span>
+            <span style={{ fontSize: '1.25rem', fontWeight: 'bold', color: '#111827' }}>ShopSphere</span>
           </Link>
 
           {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center space-x-8">
+          <div style={{ display: 'none', alignItems: 'center', gap: '2rem' }}>
             {navigation.map((item) => (
               <Link
                 key={item.name}
                 to={item.href}
-                className={`px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200 ${
-                  isActive(item.href)
-                    ? 'text-blue-600 bg-blue-50'
-                    : 'text-gray-700 hover:text-blue-600 hover:bg-gray-50'
-                }`}
+                style={{
+                  padding: '0.5rem 0.75rem',
+                  borderRadius: '0.375rem',
+                  fontSize: '0.875rem',
+                  fontWeight: '500',
+                  transition: 'all 0.2s',
+                  ...(isActive(item.href)
+                    ? { color: '#2563eb', background: '#dbeafe' }
+                    : { color: '#374151' })
+                }}
+                onMouseEnter={(e) => {
+                  if (!isActive(item.href)) {
+                    e.target.style.color = '#2563eb';
+                    e.target.style.background = '#f3f4f6';
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  if (!isActive(item.href)) {
+                    e.target.style.color = '#374151';
+                    e.target.style.background = 'transparent';
+                  }
+                }}
               >
                 {item.name}
               </Link>
@@ -47,39 +67,87 @@ const Navbar = () => {
           </div>
 
           {/* Desktop User Menu */}
-          <div className="hidden md:flex items-center space-x-4">
+          <div style={{ display: 'none', alignItems: 'center', gap: '1rem' }}>
             {user ? (
-              <div className="flex items-center space-x-4">
+              <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
                 {/* Admin Dashboard Link */}
                 {isAdmin && (
                   <Link
                     to="/admin"
-                    className="px-3 py-2 rounded-md text-sm font-medium text-purple-700 bg-purple-50 hover:bg-purple-100 transition-colors duration-200"
+                    style={{
+                      padding: '0.5rem 0.75rem',
+                      borderRadius: '0.375rem',
+                      fontSize: '0.875rem',
+                      fontWeight: '500',
+                      color: '#7c3aed',
+                      background: '#f3f4f6',
+                      transition: 'all 0.2s'
+                    }}
+                    onMouseEnter={(e) => {
+                      e.target.style.background = '#e9d5ff';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.target.style.background = '#f3f4f6';
+                    }}
                   >
                     Admin Dashboard
                   </Link>
                 )}
                 
-                <span className="text-gray-700">Hello, {user.name}</span>
+                <span style={{ color: '#374151' }}>Hello, {user.name}</span>
                 
                 {/* Profile and Orders Links */}
                 <Link
                   to="/profile"
-                  className={`px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200 ${
-                    isActive('/profile')
-                      ? 'text-blue-600 bg-blue-50'
-                      : 'text-gray-700 hover:text-blue-600 hover:bg-gray-50'
-                  }`}
+                  style={{
+                    padding: '0.5rem 0.75rem',
+                    borderRadius: '0.375rem',
+                    fontSize: '0.875rem',
+                    fontWeight: '500',
+                    transition: 'all 0.2s',
+                    ...(isActive('/profile')
+                      ? { color: '#2563eb', background: '#dbeafe' }
+                      : { color: '#374151' })
+                  }}
+                  onMouseEnter={(e) => {
+                    if (!isActive('/profile')) {
+                      e.target.style.color = '#2563eb';
+                      e.target.style.background = '#f3f4f6';
+                    }
+                  }}
+                  onMouseLeave={(e) => {
+                    if (!isActive('/profile')) {
+                      e.target.style.color = '#374151';
+                      e.target.style.background = 'transparent';
+                    }
+                  }}
                 >
                   Profile
                 </Link>
                 <Link
                   to="/orders"
-                  className={`px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200 ${
-                    isActive('/orders')
-                      ? 'text-blue-600 bg-blue-50'
-                      : 'text-gray-700 hover:text-blue-600 hover:bg-gray-50'
-                  }`}
+                  style={{
+                    padding: '0.5rem 0.75rem',
+                    borderRadius: '0.375rem',
+                    fontSize: '0.875rem',
+                    fontWeight: '500',
+                    transition: 'all 0.2s',
+                    ...(isActive('/orders')
+                      ? { color: '#2563eb', background: '#dbeafe' }
+                      : { color: '#374151' })
+                  }}
+                  onMouseEnter={(e) => {
+                    if (!isActive('/orders')) {
+                      e.target.style.color = '#2563eb';
+                      e.target.style.background = '#f3f4f6';
+                    }
+                  }}
+                  onMouseLeave={(e) => {
+                    if (!isActive('/orders')) {
+                      e.target.style.color = '#374151';
+                      e.target.style.background = 'transparent';
+                    }
+                  }}
                 >
                   Orders
                 </Link>
@@ -87,34 +155,97 @@ const Navbar = () => {
                 {/* Cart with item count */}
                 <Link
                   to="/cart"
-                  className="relative p-2 text-gray-700 hover:text-blue-600 transition-colors duration-200"
+                  style={{ position: 'relative', padding: '0.5rem', color: '#374151', transition: 'color 0.2s' }}
+                  onMouseEnter={(e) => {
+                    e.target.style.color = '#2563eb';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.target.style.color = '#374151';
+                  }}
                 >
                   🛒
-                  {getCartItemsCount() > 0 && (
-                    <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
-                      {getCartItemsCount()}
+                  {cartItemsCount > 0 && (
+                    <span style={{
+                      position: 'absolute',
+                      top: '-0.25rem',
+                      right: '-0.25rem',
+                      background: '#ef4444',
+                      color: 'white',
+                      fontSize: '0.75rem',
+                      borderRadius: '50%',
+                      width: '1.25rem',
+                      height: '1.25rem',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center'
+                    }}>
+                      {cartItemsCount}
                     </span>
                   )}
                 </Link>
                 
                 <button
                   onClick={logout}
-                  className="bg-gray-200 text-gray-700 px-4 py-2 rounded-md text-sm font-medium hover:bg-gray-300 transition-colors duration-200"
+                  style={{
+                    background: '#e5e7eb',
+                    color: '#374151',
+                    padding: '0.5rem 1rem',
+                    borderRadius: '0.375rem',
+                    fontSize: '0.875rem',
+                    fontWeight: '500',
+                    border: 'none',
+                    cursor: 'pointer',
+                    transition: 'background 0.2s'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.target.style.background = '#d1d5db';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.target.style.background = '#e5e7eb';
+                  }}
                 >
                   Logout
                 </button>
               </div>
             ) : (
-              <div className="flex items-center space-x-3">
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
                 <Link 
                   to="/login" 
-                  className="bg-gray-200 text-gray-700 px-4 py-2 rounded-md text-sm font-medium hover:bg-gray-300 transition-colors duration-200"
+                  style={{
+                    background: '#e5e7eb',
+                    color: '#374151',
+                    padding: '0.5rem 1rem',
+                    borderRadius: '0.375rem',
+                    fontSize: '0.875rem',
+                    fontWeight: '500',
+                    transition: 'background 0.2s'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.target.style.background = '#d1d5db';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.target.style.background = '#e5e7eb';
+                  }}
                 >
                   Login
                 </Link>
                 <Link 
                   to="/register" 
-                  className="bg-blue-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-blue-700 transition-colors duration-200"
+                  style={{
+                    background: '#2563eb',
+                    color: 'white',
+                    padding: '0.5rem 1rem',
+                    borderRadius: '0.375rem',
+                    fontSize: '0.875rem',
+                    fontWeight: '500',
+                    transition: 'background 0.2s'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.target.style.background = '#1d4ed8';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.target.style.background = '#2563eb';
+                  }}
                 >
                   Register
                 </Link>
@@ -123,10 +254,23 @@ const Navbar = () => {
           </div>
 
           {/* Mobile menu button */}
-          <div className="md:hidden">
+          <div>
             <button
               onClick={() => setIsMenuOpen(!isMenuOpen)}
-              className="p-2 rounded-md text-gray-700 hover:text-blue-600 hover:bg-gray-50 transition-colors duration-200"
+              style={{
+                padding: '0.5rem',
+                borderRadius: '0.375rem',
+                color: '#374151',
+                transition: 'all 0.2s'
+              }}
+              onMouseEnter={(e) => {
+                e.target.style.color = '#2563eb';
+                e.target.style.background = '#f3f4f6';
+              }}
+              onMouseLeave={(e) => {
+                e.target.style.color = '#374151';
+                e.target.style.background = 'transparent';
+              }}
             >
               {isMenuOpen ? '✕' : '☰'}
             </button>
@@ -135,18 +279,35 @@ const Navbar = () => {
 
         {/* Mobile Navigation */}
         {isMenuOpen && (
-          <div className="md:hidden py-4 border-t border-gray-200">
-            <div className="flex flex-col space-y-2">
+          <div style={{ padding: '1rem 0', borderTop: '1px solid #e5e7eb' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
               {navigation.map((item) => (
                 <Link
                   key={item.name}
                   to={item.href}
                   onClick={() => setIsMenuOpen(false)}
-                  className={`px-3 py-2 rounded-md text-base font-medium transition-colors duration-200 ${
-                    isActive(item.href)
-                      ? 'text-blue-600 bg-blue-50'
-                      : 'text-gray-700 hover:text-blue-600 hover:bg-gray-50'
-                  }`}
+                  style={{
+                    padding: '0.75rem',
+                    borderRadius: '0.375rem',
+                    fontSize: '1rem',
+                    fontWeight: '500',
+                    transition: 'all 0.2s',
+                    ...(isActive(item.href)
+                      ? { color: '#2563eb', background: '#dbeafe' }
+                      : { color: '#374151' })
+                  }}
+                  onMouseEnter={(e) => {
+                    if (!isActive(item.href)) {
+                      e.target.style.color = '#2563eb';
+                      e.target.style.background = '#f3f4f6';
+                    }
+                  }}
+                  onMouseLeave={(e) => {
+                    if (!isActive(item.href)) {
+                      e.target.style.color = '#374151';
+                      e.target.style.background = 'transparent';
+                    }
+                  }}
                 >
                   {item.name}
                 </Link>
@@ -157,7 +318,21 @@ const Navbar = () => {
                 <Link
                   to="/admin"
                   onClick={() => setIsMenuOpen(false)}
-                  className="px-3 py-2 rounded-md text-base font-medium text-purple-700 bg-purple-50 hover:bg-purple-100 transition-colors duration-200"
+                  style={{
+                    padding: '0.75rem',
+                    borderRadius: '0.375rem',
+                    fontSize: '1rem',
+                    fontWeight: '500',
+                    color: '#7c3aed',
+                    background: '#f3f4f6',
+                    transition: 'all 0.2s'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.target.style.background = '#e9d5ff';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.target.style.background = '#f3f4f6';
+                  }}
                 >
                   Admin Dashboard
                 </Link>
@@ -169,22 +344,56 @@ const Navbar = () => {
                   <Link
                     to="/profile"
                     onClick={() => setIsMenuOpen(false)}
-                    className={`px-3 py-2 rounded-md text-base font-medium transition-colors duration-200 ${
-                      isActive('/profile')
-                        ? 'text-blue-600 bg-blue-50'
-                        : 'text-gray-700 hover:text-blue-600 hover:bg-gray-50'
-                    }`}
+                    style={{
+                      padding: '0.75rem',
+                      borderRadius: '0.375rem',
+                      fontSize: '1rem',
+                      fontWeight: '500',
+                      transition: 'all 0.2s',
+                      ...(isActive('/profile')
+                        ? { color: '#2563eb', background: '#dbeafe' }
+                        : { color: '#374151' })
+                    }}
+                    onMouseEnter={(e) => {
+                      if (!isActive('/profile')) {
+                        e.target.style.color = '#2563eb';
+                        e.target.style.background = '#f3f4f6';
+                      }
+                    }}
+                    onMouseLeave={(e) => {
+                      if (!isActive('/profile')) {
+                        e.target.style.color = '#374151';
+                        e.target.style.background = 'transparent';
+                      }
+                    }}
                   >
                     Profile
                   </Link>
                   <Link
                     to="/orders"
                     onClick={() => setIsMenuOpen(false)}
-                    className={`px-3 py-2 rounded-md text-base font-medium transition-colors duration-200 ${
-                      isActive('/orders')
-                        ? 'text-blue-600 bg-blue-50'
-                        : 'text-gray-700 hover:text-blue-600 hover:bg-gray-50'
-                    }`}
+                    style={{
+                      padding: '0.75rem',
+                      borderRadius: '0.375rem',
+                      fontSize: '1rem',
+                      fontWeight: '500',
+                      transition: 'all 0.2s',
+                      ...(isActive('/orders')
+                        ? { color: '#2563eb', background: '#dbeafe' }
+                        : { color: '#374151' })
+                    }}
+                    onMouseEnter={(e) => {
+                      if (!isActive('/orders')) {
+                        e.target.style.color = '#2563eb';
+                        e.target.style.background = '#f3f4f6';
+                      }
+                    }}
+                    onMouseLeave={(e) => {
+                      if (!isActive('/orders')) {
+                        e.target.style.color = '#374151';
+                        e.target.style.background = 'transparent';
+                      }
+                    }}
                   >
                     Orders
                   </Link>
@@ -193,7 +402,26 @@ const Navbar = () => {
                       logout();
                       setIsMenuOpen(false);
                     }}
-                    className="px-3 py-2 rounded-md text-base font-medium text-left text-gray-700 hover:text-blue-600 hover:bg-gray-50 transition-colors duration-200"
+                    style={{
+                      padding: '0.75rem',
+                      borderRadius: '0.375rem',
+                      fontSize: '1rem',
+                      fontWeight: '500',
+                      color: '#374151',
+                      textAlign: 'left',
+                      border: 'none',
+                      background: 'transparent',
+                      cursor: 'pointer',
+                      transition: 'all 0.2s'
+                    }}
+                    onMouseEnter={(e) => {
+                      e.target.style.color = '#2563eb';
+                      e.target.style.background = '#f3f4f6';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.target.style.color = '#374151';
+                      e.target.style.background = 'transparent';
+                    }}
                   >
                     Logout
                   </button>
@@ -203,14 +431,44 @@ const Navbar = () => {
                   <Link
                     to="/login"
                     onClick={() => setIsMenuOpen(false)}
-                    className="px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-blue-600 hover:bg-gray-50 transition-colors duration-200"
+                    style={{
+                      padding: '0.75rem',
+                      borderRadius: '0.375rem',
+                      fontSize: '1rem',
+                      fontWeight: '500',
+                      color: '#374151',
+                      transition: 'all 0.2s'
+                    }}
+                    onMouseEnter={(e) => {
+                      e.target.style.color = '#2563eb';
+                      e.target.style.background = '#f3f4f6';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.target.style.color = '#374151';
+                      e.target.style.background = 'transparent';
+                    }}
                   >
                     Login
                   </Link>
                   <Link
                     to="/register"
                     onClick={() => setIsMenuOpen(false)}
-                    className="px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-blue-600 hover:bg-gray-50 transition-colors duration-200"
+                    style={{
+                      padding: '0.75rem',
+                      borderRadius: '0.375rem',
+                      fontSize: '1rem',
+                      fontWeight: '500',
+                      color: '#374151',
+                      transition: 'all 0.2s'
+                    }}
+                    onMouseEnter={(e) => {
+                      e.target.style.color = '#2563eb';
+                      e.target.style.background = '#f3f4f6';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.target.style.color = '#374151';
+                      e.target.style.background = 'transparent';
+                    }}
                   >
                     Register
                   </Link>

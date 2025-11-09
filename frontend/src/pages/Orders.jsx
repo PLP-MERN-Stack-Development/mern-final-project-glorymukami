@@ -1,163 +1,129 @@
 import React, { useState, useEffect } from 'react';
 import { orderAPI } from '../services/api';
-import { useAuth } from '../context/AuthContext';
-import { Link } from 'react-router-dom';
 
 const Orders = () => {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
-  const { user } = useAuth();
+  const [error, setError] = useState('');
 
   useEffect(() => {
-    if (user) {
-      fetchOrders();
-    }
-  }, [user]);
+    fetchOrders();
+  }, []);
 
   const fetchOrders = async () => {
     try {
+      console.log('📦 Fetching orders...');
       const response = await orderAPI.getMyOrders();
-      setOrders(response.data.data);
+      console.log('✅ Orders response:', response.data);
+      setOrders(response.data.data || []);
     } catch (error) {
-      console.error('Error fetching orders:', error);
+      console.error('❌ Orders error:', error);
+      setError(error.response?.data?.message || 'Failed to load orders');
     } finally {
       setLoading(false);
     }
   };
 
-  const getStatusColor = (status) => {
-    const colors = {
-      pending: 'bg-yellow-100 text-yellow-800',
-      confirmed: 'bg-blue-100 text-blue-800',
-      processing: 'bg-purple-100 text-purple-800',
-      shipped: 'bg-indigo-100 text-indigo-800',
-      delivered: 'bg-green-100 text-green-800',
-      cancelled: 'bg-red-100 text-red-800'
-    };
-    return colors[status] || 'bg-gray-100 text-gray-800';
-  };
-
-  if (!user) {
+  if (loading) {
     return (
-      <div className="min-h-screen py-8">
-        <div className="max-w-4xl mx-auto px-4">
-          <div className="text-center">
-            <h1 className="text-3xl font-bold text-gray-900 mb-4">Please Log In</h1>
-            <p className="text-gray-600">You need to be logged in to view your orders.</p>
-          </div>
+      <div style={{ minHeight: '50vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <div style={{ textAlign: 'center' }}>
+          <div style={{ width: '40px', height: '40px', border: '3px solid #e5e7eb', borderTop: '3px solid #3b82f6', borderRadius: '50%', animation: 'spin 1s linear infinite', margin: '0 auto 16px' }}></div>
+          <p style={{ color: '#6b7280' }}>Loading orders...</p>
         </div>
       </div>
     );
   }
 
-  if (loading) {
+  if (error) {
     return (
-      <div className="min-h-screen py-8">
-        <div className="max-w-6xl mx-auto px-4">
-          <div className="text-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-            <p className="mt-4 text-gray-600">Loading your orders...</p>
-          </div>
+      <div style={{ minHeight: '50vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <div style={{ textAlign: 'center' }}>
+          <h2 style={{ color: '#dc2626', marginBottom: '1rem' }}>Error Loading Orders</h2>
+          <p style={{ color: '#6b7280', marginBottom: '2rem' }}>{error}</p>
+          <button 
+            onClick={fetchOrders}
+            style={{ background: '#2563eb', color: 'white', padding: '0.5rem 1rem', borderRadius: '0.375rem', border: 'none', cursor: 'pointer' }}
+          >
+            Try Again
+          </button>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen py-8 bg-gray-50">
-      <div className="max-w-6xl mx-auto px-4">
-        <div className="flex justify-between items-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">My Orders</h1>
-          <Link to="/products" className="btn-primary">
-            Continue Shopping
-          </Link>
+    <div style={{ padding: '2rem', maxWidth: '80rem', margin: '0 auto' }}>
+      <h1 style={{ fontSize: '2rem', fontWeight: 'bold', color: '#111827', marginBottom: '2rem' }}>My Orders</h1>
+      
+      {orders.length === 0 ? (
+        <div style={{ textAlign: 'center', padding: '4rem 2rem', background: '#f9fafb', borderRadius: '0.5rem' }}>
+          <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>📦</div>
+          <h3 style={{ fontSize: '1.5rem', fontWeight: '600', color: '#374151', marginBottom: '1rem' }}>No orders yet</h3>
+          <p style={{ color: '#6b7280', marginBottom: '2rem' }}>Your orders will appear here once you make a purchase.</p>
+          <a 
+            href="/products" 
+            style={{ background: '#2563eb', color: 'white', padding: '0.75rem 1.5rem', borderRadius: '0.375rem', textDecoration: 'none', display: 'inline-block' }}
+          >
+            Start Shopping
+          </a>
         </div>
-
-        {orders.length === 0 ? (
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-12 text-center">
-            <div className="text-6xl mb-4">📦</div>
-            <h2 className="text-2xl font-semibold text-gray-900 mb-2">No Orders Yet</h2>
-            <p className="text-gray-600 mb-6">Start shopping to see your orders here</p>
-            <Link to="/products" className="btn-primary">
-              Start Shopping
-            </Link>
-          </div>
-        ) : (
-          <div className="space-y-6">
-            {orders.map((order) => (
-              <div key={order._id} className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
-                {/* Order Header */}
-                <div className="bg-gray-50 px-6 py-4 border-b border-gray-200">
-                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
-                    <div>
-                      <p className="font-semibold">Order #{order.orderNumber}</p>
-                      <p className="text-sm text-gray-600">
-                        Placed on {new Date(order.createdAt).toLocaleDateString()}
-                      </p>
-                    </div>
-                    <div className="mt-2 sm:mt-0">
-                      <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(order.status)}`}>
-                        {order.status.charAt(0).toUpperCase() + order.status.slice(1)}
-                      </span>
-                    </div>
-                  </div>
+      ) : (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+          {orders.map((order) => (
+            <div key={order._id} style={{ background: 'white', padding: '1.5rem', borderRadius: '0.5rem', boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1)', border: '1px solid #e5e7eb' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
+                <h3 style={{ fontWeight: '600', color: '#111827' }}>Order #{order._id.slice(-8)}</h3>
+                <span style={{ 
+                  padding: '0.25rem 0.75rem', 
+                  borderRadius: '9999px', 
+                  fontSize: '0.875rem',
+                  fontWeight: '500',
+                  background: 
+                    order.status === 'delivered' ? '#dcfce7' :
+                    order.status === 'shipped' ? '#dbeafe' :
+                    order.status === 'processing' ? '#fef3c7' : '#f3f4f6',
+                  color: 
+                    order.status === 'delivered' ? '#166534' :
+                    order.status === 'shipped' ? '#1e40af' :
+                    order.status === 'processing' ? '#92400e' : '#374151'
+                }}>
+                  {order.status}
+                </span>
+              </div>
+              
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1rem', marginBottom: '1rem' }}>
+                <div>
+                  <strong>Total:</strong> ${order.totalPrice}
                 </div>
-
-                {/* Order Items */}
-                <div className="p-6">
-                  <div className="space-y-4">
-                    {order.orderItems.slice(0, 2).map((item, index) => (
-                      <div key={index} className="flex items-center justify-between">
-                        <div className="flex items-center space-x-3">
-                          <div className="w-12 h-12 bg-gray-200 rounded flex items-center justify-center">
-                            📦
-                          </div>
-                          <div>
-                            <p className="font-medium">{item.name}</p>
-                            <p className="text-gray-600 text-sm">Qty: {item.quantity}</p>
-                          </div>
-                        </div>
-                        <p className="font-semibold">${(item.price * item.quantity).toFixed(2)}</p>
-                      </div>
-                    ))}
-                    
-                    {order.orderItems.length > 2 && (
-                      <p className="text-sm text-gray-600 text-center">
-                        +{order.orderItems.length - 2} more items
-                      </p>
-                    )}
-                  </div>
-
-                  {/* Order Footer */}
-                  <div className="mt-6 pt-6 border-t border-gray-200 flex flex-col sm:flex-row sm:items-center sm:justify-between">
-                    <div>
-                      <p className="text-lg font-semibold">
-                        Total: ${order.totalPrice?.toFixed(2)}
-                      </p>
-                      {order.isPaid && (
-                        <p className="text-sm text-green-600">Paid on {new Date(order.paidAt).toLocaleDateString()}</p>
-                      )}
-                    </div>
-                    <div className="mt-4 sm:mt-0 space-x-3">
-                      <Link 
-                        to={`/order-success/${order._id}`}
-                        className="btn-secondary"
-                      >
-                        View Details
-                      </Link>
-                      {order.status === 'pending' && (
-                        <button className="btn-primary">
-                          Track Order
-                        </button>
-                      )}
-                    </div>
-                  </div>
+                <div>
+                  <strong>Items:</strong> {order.orderItems.length}
+                </div>
+                <div>
+                  <strong>Date:</strong> {new Date(order.createdAt).toLocaleDateString()}
                 </div>
               </div>
-            ))}
-          </div>
-        )}
-      </div>
+
+              <div style={{ borderTop: '1px solid #e5e7eb', paddingTop: '1rem' }}>
+                <h4 style={{ fontWeight: '500', marginBottom: '0.5rem' }}>Items:</h4>
+                {order.orderItems.map((item, index) => (
+                  <div key={index} style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '0.5rem' }}>
+                    <img 
+                      src={item.image} 
+                      alt={item.name}
+                      style={{ width: '40px', height: '40px', objectFit: 'cover', borderRadius: '0.375rem' }}
+                    />
+                    <div>
+                      <p style={{ fontWeight: '500' }}>{item.name}</p>
+                      <p style={{ color: '#6b7280', fontSize: '0.875rem' }}>Qty: {item.quantity} × ${item.price}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 };

@@ -23,46 +23,34 @@ const app = express();
 // Security middleware
 app.use(helmet());
 
-// Rate limiting
-const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 1000, // limit each IP to 1000 requests per windowMs
-  message: {
-    success: false,
-    error: 'Too many requests from this IP, please try again later.'
+// DISABLE RATE LIMITING FOR DEVELOPMENT - Comment this out
+// const limiter = rateLimit({
+//   windowMs: 15 * 60 * 1000, // 15 minutes
+//   max: 1000, // limit each IP to 1000 requests per windowMs
+//   message: {
+//     success: false,
+//     error: 'Too many requests from this IP, please try again later.'
+//   }
+// });
+// app.use('/api/', limiter);
+
+// NUCLEAR CORS FIX - Allow everything
+app.use((req, res, next) => {
+  res.header('Access-Control-Allow-Origin', '*');
+  res.header('Access-Control-Allow-Headers', '*');
+  res.header('Access-Control-Allow-Methods', '*');
+  res.header('Access-Control-Allow-Credentials', 'true');
+  
+  console.log('🔧 CORS Headers Set for:', req.method, req.url);
+  
+  // Handle preflight requests
+  if (req.method === 'OPTIONS') {
+    console.log('🛬 Preflight request handled');
+    return res.status(200).end();
   }
+  
+  next();
 });
-app.use('/api/', limiter);
-
-// CORS configuration - UPDATED & FIXED
-const allowedOrigins = [
-  'http://localhost:5173',
-  'http://127.0.0.1:5173',
-  'https://your-shopsphere-app.vercel.app', // Your future frontend URL
-  process.env.CLIENT_URL // From environment variable
-].filter(Boolean); // Remove any undefined values
-
-app.use(cors({
-  origin: function (origin, callback) {
-    // Allow requests with no origin (like mobile apps or curl requests)
-    if (!origin) return callback(null, true);
-    
-    if (allowedOrigins.indexOf(origin) === -1) {
-      const msg = `The CORS policy for this site does not allow access from the specified Origin: ${origin}`;
-      console.log('🚫 CORS Blocked:', origin);
-      return callback(new Error(msg), false);
-    }
-    
-    console.log('✅ CORS Allowed:', origin);
-    return callback(null, true);
-  },
-  credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept', 'Origin']
-}));
-
-// Handle preflight requests explicitly
-app.options('*', cors());
 
 // Special handling for webhook - must come before express.json()
 app.post('/api/payments/webhook', express.raw({type: 'application/json'}), (req, res, next) => {
@@ -79,14 +67,14 @@ app.use((req, res, next) => {
   next();
 });
 
-// CORS test route - ADD THIS
+// CORS test route
 app.get('/api/test-cors', (req, res) => {
   res.json({
     success: true,
     message: 'CORS is working correctly! 🎉',
-    allowedOrigins: allowedOrigins,
     yourOrigin: req.headers.origin || 'No origin header',
-    timestamp: new Date().toISOString()
+    timestamp: new Date().toISOString(),
+    headers: req.headers
   });
 });
 

@@ -1,10 +1,8 @@
 import React, { createContext, useState, useContext, useEffect } from 'react';
 import { authAPI } from '../services/api';
 
-// Create context
 const AuthContext = createContext(null);
 
-// Custom hook to use auth context
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (!context) {
@@ -13,7 +11,6 @@ export const useAuth = () => {
   return context;
 };
 
-// Auth Provider Component
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -28,7 +25,6 @@ export const AuthProvider = ({ children }) => {
     
     if (token && savedUser) {
       try {
-        // Verify token is still valid by fetching profile
         const response = await authAPI.getProfile();
         if (response.data.success) {
           setUser(response.data.data);
@@ -44,58 +40,104 @@ export const AuthProvider = ({ children }) => {
 
   const login = async (email, password) => {
     try {
+      console.log('🔐 Attempting login for:', email);
       const response = await authAPI.login({ email, password });
+      console.log('✅ Raw login response:', response.data);
       
       if (response.data.success) {
-        // SIMPLE APPROACH: Store whatever the backend sends
         const responseData = response.data;
         
-        // Extract token - try different possible locations
-        const token = responseData.token || responseData.data?.token || responseData.accessToken;
+        // DEBUG: Log the entire response structure
+        console.log('📋 Full response data:', JSON.stringify(responseData, null, 2));
         
-        // Extract user data - try different possible locations
-        const userData = responseData.user || responseData.data?.user || responseData.data || responseData;
+        // Extract token - check multiple possible locations
+        const token = responseData.token || responseData.data?.token;
+        console.log('🔑 Extracted token:', token ? 'Found' : 'Not found');
         
-        if (token) {
+        // Extract user data - check ALL possible locations systematically
+        let userData = null;
+        
+        if (responseData.data?.user) {
+          userData = responseData.data.user;
+          console.log('👤 User from: response.data.data.user');
+        } else if (responseData.user) {
+          userData = responseData.user;
+          console.log('👤 User from: response.data.user');
+        } else if (responseData.data) {
+          userData = responseData.data;
+          console.log('👤 User from: response.data.data');
+        } else {
+          userData = responseData;
+          console.log('👤 User from: response.data');
+        }
+        
+        console.log('🎯 Final user data to store:', userData);
+        console.log('👑 User role:', userData?.role);
+        
+        if (token && userData) {
           localStorage.setItem('token', token);
           localStorage.setItem('user', JSON.stringify(userData));
           setUser(userData);
           return response.data;
         } else {
-          throw new Error('No token received from server');
+          console.error('❌ Missing token or user data');
         }
-      } else {
-        throw new Error(response.data.message || 'Login failed');
       }
+      throw new Error(response.data.message || 'Login failed');
     } catch (error) {
-      console.error('Login error:', error);
+      console.error('❌ Login error:', error);
       throw error;
     }
   };
 
   const register = async (userData) => {
     try {
+      console.log('📝 Attempting registration for:', userData.email);
       const response = await authAPI.register(userData);
+      console.log('✅ Raw registration response:', response.data);
       
       if (response.data.success) {
-        // Same simple approach as login
         const responseData = response.data;
-        const token = responseData.token || responseData.data?.token || responseData.accessToken;
-        const newUser = responseData.user || responseData.data?.user || responseData.data || responseData;
         
-        if (token) {
+        // DEBUG: Log the entire response structure
+        console.log('📋 Full response data:', JSON.stringify(responseData, null, 2));
+        
+        // Extract token
+        const token = responseData.token || responseData.data?.token;
+        console.log('🔑 Extracted token:', token ? 'Found' : 'Not found');
+        
+        // Extract user data - same systematic approach as login
+        let newUser = null;
+        
+        if (responseData.data?.user) {
+          newUser = responseData.data.user;
+          console.log('👤 User from: response.data.data.user');
+        } else if (responseData.user) {
+          newUser = responseData.user;
+          console.log('👤 User from: response.data.user');
+        } else if (responseData.data) {
+          newUser = responseData.data;
+          console.log('👤 User from: response.data.data');
+        } else {
+          newUser = responseData;
+          console.log('👤 User from: response.data');
+        }
+        
+        console.log('🎯 Final user data to store:', newUser);
+        console.log('👑 User role:', newUser?.role);
+        
+        if (token && newUser) {
           localStorage.setItem('token', token);
           localStorage.setItem('user', JSON.stringify(newUser));
           setUser(newUser);
           return response.data;
         } else {
-          throw new Error('No token received from server');
+          console.error('❌ Missing token or user data');
         }
-      } else {
-        throw new Error(response.data.message || 'Registration failed');
       }
+      throw new Error(response.data.message || 'Registration failed');
     } catch (error) {
-      console.error('Registration error:', error);
+      console.error('❌ Registration error:', error);
       throw error;
     }
   };

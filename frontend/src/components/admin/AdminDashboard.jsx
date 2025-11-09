@@ -2,27 +2,27 @@ import React from 'react';
 
 const AdminDashboard = () => {
   return (
-    <div className="p-6 max-w-7xl mx-auto">
-      <h1 className="text-3xl font-bold text-gray-900 mb-6">Admin Dashboard</h1>
+    <div style={{ padding: '1.5rem', maxWidth: '80rem', margin: '0 auto' }}>
+      <h1 style={{ fontSize: '1.875rem', fontWeight: 'bold', color: '#111827', marginBottom: '1.5rem' }}>Admin Dashboard</h1>
       
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-        <div className="bg-white p-6 rounded-lg shadow-md border">
-          <h3 className="text-lg font-semibold text-gray-600">Total Revenue</h3>
-          <p className="text-2xl font-bold text-gray-900 mt-1">$0</p>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(1, 1fr)', gap: '1.5rem', marginBottom: '2rem' }}>
+        <div style={{ background: 'white', padding: '1.5rem', borderRadius: '0.5rem', boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1)', border: '1px solid #e5e7eb' }}>
+          <h3 style={{ fontSize: '1.125rem', fontWeight: '600', color: '#374151' }}>Total Revenue</h3>
+          <p style={{ fontSize: '1.5rem', fontWeight: 'bold', color: '#111827', marginTop: '0.25rem' }}>$0</p>
         </div>
-        <div className="bg-white p-6 rounded-lg shadow-md border">
-          <h3 className="text-lg font-semibold text-gray-600">Total Orders</h3>
-          <p className="text-2xl font-bold text-gray-900 mt-1">0</p>
+        <div style={{ background: 'white', padding: '1.5rem', borderRadius: '0.5rem', boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1)', border: '1px solid #e5e7eb' }}>
+          <h3 style={{ fontSize: '1.125rem', fontWeight: '600', color: '#374151' }}>Total Orders</h3>
+          <p style={{ fontSize: '1.5rem', fontWeight: 'bold', color: '#111827', marginTop: '0.25rem' }}>0</p>
         </div>
-        <div className="bg-white p-6 rounded-lg shadow-md border">
-          <h3 className="text-lg font-semibold text-gray-600">Total Users</h3>
-          <p className="text-2xl font-bold text-gray-900 mt-1">0</p>
+        <div style={{ background: 'white', padding: '1.5rem', borderRadius: '0.5rem', boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1)', border: '1px solid #e5e7eb' }}>
+          <h3 style={{ fontSize: '1.125rem', fontWeight: '600', color: '#374151' }}>Total Users</h3>
+          <p style={{ fontSize: '1.5rem', fontWeight: 'bold', color: '#111827', marginTop: '0.25rem' }}>0</p>
         </div>
       </div>
 
-      <div className="bg-white p-6 rounded-lg shadow-md border">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">Recent Activity</h3>
-        <p className="text-gray-600">No recent activity</p>
+      <div style={{ background: 'white', padding: '1.5rem', borderRadius: '0.5rem', boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1)', border: '1px solid #e5e7eb' }}>
+        <h3 style={{ fontSize: '1.125rem', fontWeight: '600', color: '#111827', marginBottom: '1rem' }}>Recent Activity</h3>
+        <p style={{ color: '#6b7280' }}>No recent activity</p>
       </div>
     </div>
   );
