@@ -1,9 +1,9 @@
 # 🏆 ShopSphere - Full Stack E-Commerce Platform
 
 ## 🌐 Live Demo
-- **Frontend**: https://your-shopsphere-app.vercel.app
-- **Backend API**: https://your-shopsphere-api.railway.app
-- **GitHub**: https://github.com/yourusername/shopsphere
+- **Frontend**: https://mern-final-project-glorymukami-swkf.vercel.app
+- **Backend API**: https://mern-final-project-glorymukami.onrender.com
+- **GitHub**: https://github.com/PLP-MERN-Stack-Development/mern-final-project-glorymukami.git
 
 ## 📋 Features
 - ✅ User Authentication & Authorization
