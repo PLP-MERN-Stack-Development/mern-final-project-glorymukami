@@ -1,14 +1,12 @@
 import axios from 'axios';
 
-// Use this line - it will work for both local and production
-const API_BASE_URL = window.location.hostname === 'localhost' 
-  ? 'http://localhost:5000/api' 
-  : 'https://mern-final-project-glorymukami.onrender.com/api';
+// Use environment variable for production, fallback to localhost for development
+const API_BASE_URL = 'https://mern-final-project-glorymukami.onrender.com/api';
 
 // Create axios instance
 const api = axios.create({
   baseURL: API_BASE_URL,
-  timeout: 10000,
+  timeout: 30000,
 });
 
 // Request interceptor to add auth token
@@ -58,7 +56,7 @@ export const productAPI = {
   getVendorProducts: () => api.get('/products/vendor/my-products'),
 };
 
-// Review API methods
+// NEW: Review API methods
 export const reviewAPI = {
   getProductReviews: (productId, params = {}) => api.get(`/products/${productId}/reviews`, { params }),
   createReview: (productId, reviewData) => api.post(`/products/${productId}/reviews`, reviewData),
@@ -87,14 +85,14 @@ export const orderAPI = {
   updateStatus: (id, statusData) => api.put(`/orders/${id}/status`, statusData), // Admin only
 };
 
-// Payment API methods (Stripe integration)
+// NEW: Payment API methods (Stripe integration)
 export const paymentAPI = {
   createPaymentIntent: (paymentData) => api.post('/payment/create-payment-intent', paymentData),
   createCheckoutSession: (orderId) => api.post('/payments/create-checkout-session', { orderId }),
   verify: (orderId) => api.get(`/payments/verify/${orderId}`),
 };
 
-// Enhanced Admin API methods
+// NEW: Enhanced Admin API methods
 export const adminAPI = {
   getDashboardStats: () => api.get('/admin/dashboard'),
   getRecentOrders: () => api.get('/admin/orders/recent'),
@@ -107,7 +105,7 @@ export const adminAPI = {
   getOrderStats: () => api.get('/admin/orders/stats'),
 };
 
-// User Profile API methods
+// NEW: User Profile API methods
 export const userAPI = {
   updateProfile: (userData) => api.put('/users/profile', userData),
   updateAddress: (addressData) => api.put('/users/address', addressData),
