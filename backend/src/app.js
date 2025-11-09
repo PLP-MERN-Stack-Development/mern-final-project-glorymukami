@@ -1,10 +1,12 @@
+// Load environment variables FIRST
+require('dotenv').config();
+
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
 require('express-async-errors');
-require('dotenv').config();
 
 // Import routes
 const authRoutes = require('./routes/auth');
@@ -160,6 +162,17 @@ app.use(errorHandler);
 // Database connection
 const connectDB = async () => {
   try {
+    console.log('🔧 Attempting MongoDB connection...');
+    console.log('📋 MONGODB_URI exists:', !!process.env.MONGODB_URI);
+    console.log('🌍 NODE_ENV:', process.env.NODE_ENV);
+    
+    // TEMPORARY: Log the connection string (hide password in production)
+    if (process.env.NODE_ENV === 'development') {
+      console.log('🔗 Connection string:', process.env.MONGODB_URI);
+    } else {
+      console.log('🔗 Connection string: [HIDDEN IN PRODUCTION]');
+    }
+    
     const conn = await mongoose.connect(process.env.MONGODB_URI);
     
     console.log(`✅ MongoDB Atlas Connected: ${conn.connection.host}`);
@@ -181,11 +194,16 @@ const connectDB = async () => {
     
   } catch (error) {
     console.error('❌ Database connection failed:', error.message);
+    console.error('🔍 Error name:', error.name);
+    console.error('🔍 Error code:', error.code);
     
-    if (error.name === 'MongoNetworkError') {
-      console.error('🔌 Network error - check your internet connection and MongoDB Atlas IP whitelist');
+    // More specific error handling
+    if (error.name === 'MongoParseError') {
+      console.error('🔌 Connection string format error - check MONGODB_URI');
     } else if (error.name === 'MongoServerSelectionError') {
-      console.error('🌐 Server selection error - check your connection string and cluster status');
+      console.error('🌐 Server selection error - check network access and credentials');
+    } else if (error.name === 'MongoNetworkError') {
+      console.error('🔌 Network error - check your internet connection and MongoDB Atlas IP whitelist');
     }
     
     process.exit(1);
