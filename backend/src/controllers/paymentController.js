@@ -1,3 +1,6 @@
+// Add this line - it loads environment variables
+require('dotenv').config();
+
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 const Order = require('../models/Order');
 
@@ -85,8 +88,8 @@ const createCheckoutSession = async (req, res) => {
       payment_method_types: ['card'],
       line_items: lineItems,
       mode: 'payment',
-      success_url: `${process.env.CLIENT_SUCCESS_URL}?session_id={CHECKOUT_SESSION_ID}&order_id=${orderId}`,
-      cancel_url: `${process.env.CLIENT_CANCEL_URL}?order_id=${orderId}`,
+      success_url: ${process.env.CLIENT_SUCCESS_URL}?session_id={CHECKOUT_SESSION_ID}&order_id=${orderId},
+      cancel_url: ${process.env.CLIENT_CANCEL_URL}?order_id=${orderId},
       customer_email: req.user.email,
       client_reference_id: orderId,
       metadata: {
@@ -132,7 +135,7 @@ const handleWebhook = async (req, res) => {
     event = stripe.webhooks.constructEvent(req.body, sig, process.env.STRIPE_WEBHOOK_SECRET);
   } catch (err) {
     console.error('Webhook signature verification failed:', err.message);
-    return res.status(400).send(`Webhook Error: ${err.message}`);
+    return res.status(400).send(Webhook Error: ${err.message});
   }
 
   // Handle the checkout.session.completed event
@@ -163,7 +166,7 @@ const fulfillOrder = async (session) => {
     const order = await Order.findById(orderId);
 
     if (!order) {
-      throw new Error(`Order ${orderId} not found`);
+      throw new Error(Order ${orderId} not found);
     }
 
     // Update order with payment details
@@ -198,7 +201,7 @@ const fulfillOrder = async (session) => {
     }
 
     await order.save();
-    console.log(`✅ Order ${orderId} fulfilled successfully`);
+    console.log(✅ Order ${orderId} fulfilled successfully);
 
   } catch (error) {
     console.error('Error fulfilling order:', error);
